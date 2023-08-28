@@ -8,6 +8,7 @@ $user->restrict();
 
 if ($user->has('id')){
     $post = $link->query('SELECT * FROM posts WHERE id = :id', ['id' => App::get('id')])->fetch();
+    $comments = $link->query('SELECT * FROM comments WHERE post_id = :id', ['id' => App::get('id')])->fetchAll();
 } else {
     App::redirect('Posts.php');
 }
@@ -260,7 +261,45 @@ if (App::getValidator()->isPosted()){
             ?>
     </span>
     <div class="comments">
+       <?php foreach ($comments as $comment): ?>
+           <div class="login-box" id="<?= 'CommentN'. $comment->id ?>">
+               <div class="postHeader">
+                   <div>
+                       <img alt="profile_pic" src="<?php
 
+                       $result = $link->query('SELECT c.user_id, u.avatar FROM comments c INNER JOIN users u ON c.user_id = u.id WHERE c.post_id = :id', [
+                           'id' => $post->id
+                       ])->fetch();
+
+                       if ($result->avatar === null){
+                           echo 'Assets/avatar.jpeg';
+                       } else {
+                           echo 'Uploads/Avatars/'. $result->avatar;
+                       }
+
+                       ?>">
+
+                       <div>
+                   <span>
+                    <?php
+
+                    $result = $link->query('SELECT u.username, u.status, c.content FROM users u INNER JOIN comments c ON u.id = c.user_id WHERE c.post_id = :id', [
+                        'id' => $post->id
+                    ])->fetch();
+
+                    echo $result->username;
+
+                    ?>
+                   </span>
+                           <?php if ($result->status == 'admin'): ?>
+                               <span class="status">
+                        Admin
+                    </span>
+                           <?php endif; ?>
+                       </div>
+                   </div>
+           </div>
+       <?php endforeach; ?>
     </div>
     <script>
 

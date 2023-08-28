@@ -10,7 +10,7 @@ if ($user->has('id')){
     $post_id = App::get('id');
     $post = $link->query('SELECT * FROM posts WHERE id = :id', ['id' => $post_id])->fetch();
 
-    if ($post->user_id === $session->getKey('user_infos')->id) {
+    if ($post->user_id === $session->getKey('user_infos')->id || $session->getKey('user_infos')->status === 'admin') {
         $current_image = $post->image;
         App::deleteFile($current_image, '/Uploads/Posts/');
         $link->query('DELETE FROM posts WHERE id = :id', ['id' => $post_id]);
