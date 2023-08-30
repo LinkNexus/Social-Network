@@ -62,7 +62,7 @@ if (App::getValidator()->isPosted()){
 ?>
 <?php require_once 'Include/Header.php'; ?>
 <style>
-    .login-box{
+    .post{
         color: white;
         width: 95%;
         display: flex;
@@ -71,27 +71,27 @@ if (App::getValidator()->isPosted()){
         margin-bottom: 40px;
     }
 
-    .login-box .postHeader{
+    .post .postHeader{
         margin-bottom: 50px;
         font-weight: bold;
         display: flex;
         justify-content: space-between;
     }
 
-    .login-box .postHeader div{
+    .post .postHeader div{
         display: flex;
         align-items: center;
         cursor: pointer;
     }
 
-    .login-box .postHeader div img{
+    .post .postHeader div img{
         width: 100px;
         aspect-ratio: 1;
         border-radius: 50%;
         align-self: center;
     }
 
-    .login-box .postHeader div div{
+    .post .postHeader div div{
         margin-left: 10px;
         height: 50px;
         display: flex;
@@ -100,14 +100,14 @@ if (App::getValidator()->isPosted()){
         font-size: 20px;
     }
 
-    .login-box .postHeader .status{
+    .post .postHeader .status{
         font-size: 12px;
         font-weight: normal;
         color: grey;
         font-style: italic;
     }
 
-    .login-box .postHeader a{
+    .post .postHeader a{
         font-size: 30px;
         text-align: center;
         display: inline-block;
@@ -117,27 +117,27 @@ if (App::getValidator()->isPosted()){
         box-sizing: border-box;
     }
 
-    .login-box .description{
+    .post .description{
         text-align: center;
         color: grey;
         margin-bottom: 20px;
     }
 
-    .login-box>img{
+    .post>img{
         width: calc(100% - 20px);
         align-self: center;
         margin-top: 50px;
         cursor: pointer;
     }
 
-    .login-box .postIcons{
+    .post .postIcons{
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
         margin-bottom: 20px;
     }
 
-    .login-box .postFooter{
+    .post .postFooter{
         color: grey;
         font-size: 12px;
         font-style: italic;
@@ -148,7 +148,7 @@ if (App::getValidator()->isPosted()){
         width: 100%;
     }
 
-    .login-box form .commentInput{
+    .post form .commentInput{
         width: 100%;
         height: 25px;
         border-radius: 10px;
@@ -159,7 +159,7 @@ if (App::getValidator()->isPosted()){
         margin-bottom: 30px;
     }
 
-    .login-box form button {
+    .post form button {
         position: relative;
         display: block;
         padding: 10px 20px;
@@ -175,7 +175,7 @@ if (App::getValidator()->isPosted()){
         border: none;
     }
 </style>
-<div class="login-box">
+<div class="login-box post">
     <div class="postHeader">
         <div>
             <img alt="profile_pic" src="<?php
@@ -260,73 +260,154 @@ if (App::getValidator()->isPosted()){
 
             ?>
     </span>
-    <div class="comments">
-       <?php foreach ($comments as $comment): ?>
-           <div class="login-box" id="<?= 'CommentN'. $comment->id ?>">
-               <div class="postHeader">
-                   <div>
-                       <img alt="profile_pic" src="<?php
+</div>
+<style>
+    .comments{
+        margin-top: -40px;
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+        color: white;
+        padding: 30px;
+    }
 
-                       $result = $link->query('SELECT c.user_id, u.avatar FROM comments c INNER JOIN users u ON c.user_id = u.id WHERE c.post_id = :id', [
-                           'id' => $post->id
-                       ])->fetch();
+    .comment{
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        margin-bottom: 40px;
+    }
 
-                       if ($result->avatar === null){
-                           echo 'Assets/avatar.jpeg';
-                       } else {
-                           echo 'Uploads/Avatars/'. $result->avatar;
-                       }
+    .comment .commentHeader{
+        margin-bottom: 50px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+    }
 
-                       ?>">
+    .comment .commentHeader div{
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
 
-                       <div>
+    .comment .commentHeader div img{
+        width: 35px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        align-self: center;
+    }
+
+    .comment .commentHeader div div{
+        margin-left: 10px;
+        height: 50px;
+        display: flex;
+        align-self: center;
+        flex-direction: column;
+        margin-top: 20px;
+        font-size: 12px;
+    }
+
+    .comment .commentHeader .status{
+        font-size: 10px;
+        font-weight: normal;
+        color: grey;
+        font-style: italic;
+    }
+
+    .comment .commentHeader a{
+        font-size: 30px;
+        text-align: center;
+        display: inline-block;
+        width: 45px;
+        height: 45px;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .comment .commentHeader a{
+        font-size: 20px;
+        text-align: center;
+        display: inline-block;
+        width: 45px;
+        height: 45px;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .comment .commentContent{
+        margin-top: -40px;
+        text-align: center;
+    }
+</style>
+<div class="login-box comments">
+    <?php foreach ($comments as $comment): ?>
+    <div class="login-box comment">
+        <div class="commentHeader">
+            <div>
+                <img alt="profile_pic" src="<?php
+
+                $result = $link->query('SELECT c.user_id, u.avatar FROM comments c INNER JOIN users u ON c.user_id = u.id WHERE c.id = :id', [
+                    'id' => $comment->id
+                ])->fetch();
+
+                if ($result->avatar === null){
+                    echo 'Assets/avatar.jpeg';
+                } else {
+                    echo 'Uploads/Avatars/'. $result->avatar;
+                }
+
+                ?>">
+
+                <div>
                    <span>
                     <?php
 
-                    $result = $link->query('SELECT u.username, u.status, c.content FROM users u INNER JOIN comments c ON u.id = c.user_id WHERE c.post_id = :id', [
-                        'id' => $post->id
+                    $result = $link->query('SELECT u.username, u.status, c.content FROM users u INNER JOIN comments c ON u.id = c.user_id WHERE c.id = :id', [
+                        'id' => $comment->id
                     ])->fetch();
 
                     echo $result->username;
 
                     ?>
                    </span>
-                           <?php if ($result->status == 'admin'): ?>
-                               <span class="status">
+                    <?php if ($result->status == 'admin'): ?>
+                        <span class="status">
                         Admin
                     </span>
-                           <?php endif; ?>
-                       </div>
-                   </div>
-           </div>
-       <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <a href="PostMenu.php?id=<?= $post->id ?>" class="material-symbols-outlined">more_vert</a>
+        </div>
+        <div class="commentContent"><?php echo nl2br(htmlspecialchars($result->content)) ?></div>
+        <?php endforeach; ?>
     </div>
-    <script>
-
-        let <?= 'postImage'. $post->id ?> = document.querySelector('.login-box>img'),
-            <?= 'profileSection'. $post->id ?> = document.querySelector('.postHeader>div'),
-            <?= 'commentInput'. $post->id ?> = document.querySelector('form>textarea');
-
-        if (<?= 'postImage'. $post->id ?>){
-            <?= 'postImage'. $post->id ?>.addEventListener('click', function () {
-                document.location = '<?php echo 'Uploads/Posts/' . $post->image; ?>';
-            })
-        }
-
-        <?= 'profileSection'. $post->id ?>.addEventListener('click', function () {
-            document.location = '<?php echo 'Profile.php?id=' . $post->user_id; ?>';
-        })
-
-        <?= 'commentInput'. $post->id ?>.addEventListener('focus', function () {
-            <?= 'commentInput'. $post->id ?>.style.height = '100px';
-            <?= 'commentInput'. $post->id ?>.style.transition = '0.5s';
-        })
-
-        <?= 'commentInput'. $post->id ?>.addEventListener('focusout', function () {
-            <?= 'commentInput'. $post->id ?>.style.height = '25px';
-        })
-    </script>
 </div>
+<script>
+     let <?= 'postImage'. $post->id ?> = document.querySelector('.login-box>img'),
+         <?= 'profileSection'. $post->id ?> = document.querySelector('.postHeader>div'),
+         <?= 'commentInput'. $post->id ?> = document.querySelector('form>textarea');
+
+     if (<?= 'postImage'. $post->id ?>){
+         <?= 'postImage'. $post->id ?>.addEventListener('click', function () {
+             document.location = '<?php echo 'Uploads/Posts/' . $post->image; ?>';
+         })
+     }
+
+     <?= 'profileSection'. $post->id ?>.addEventListener('click', function () {
+         document.location = '<?php echo 'Profile.php?id=' . $post->user_id; ?>';
+     })
+
+     <?= 'commentInput'. $post->id ?>.addEventListener('focus', function () {
+         <?= 'commentInput'. $post->id ?>.style.height = '100px';
+         <?= 'commentInput'. $post->id ?>.style.transition = '0.5s';
+     })
+
+     <?= 'commentInput'. $post->id ?>.addEventListener('focusout', function () {
+         <?= 'commentInput'. $post->id ?>.style.height = '25px';
+     })
+</script>
 <?php include_once 'Include/Mode.php'; ?>
 </body>
 </html>
