@@ -157,4 +157,34 @@ class App
         }
     }
 
+    public static function displayTimeAgo(string $table, $entity): string
+    {
+
+        $result = self::getDatabase()->query("SELECT TIMESTAMPDIFF(MINUTE, posted_at, NOW()) as date FROM $table WHERE user_id = :id", [
+            'id' => $entity->user_id
+        ])->fetch();
+
+        if ($result->date < 60){
+            return $result->date. ' Minutes ago';
+        } else {
+            if ($result->date < 1440){
+                return intval($result->date / 60). ' Hours ago';
+            } else {
+                if ($result->date < 10080){
+                    return intval($result->date / 1440). ' Days ago';
+                } else {
+                    if ($result->date < 40320){
+                        return intval($result->date / 10080). ' Weeks ago';
+                    } else {
+                        if ($result->date < 483840){
+                            return intval($result->date / 40320). ' Months ago';
+                        } else {
+                            return intval($result->date / 483840). ' Years ago';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

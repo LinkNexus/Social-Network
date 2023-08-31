@@ -210,33 +210,7 @@ if (App::getValidator()->isPosted()){
             <a href="#" class="material-symbols-outlined">share</a>
         </div>
         <span class="postFooter">Posted
-            <?php $result = $link->query('SELECT TIMESTAMPDIFF(MINUTE, posted_at, NOW()) as date FROM posts WHERE user_id = :id', [
-                    'id' => $post->user_id
-            ])->fetch();
-
-            if ($result->date < 60){
-                echo $result->date. ' Minutes ago';
-            } else {
-                if ($result->date < 1440){
-                    echo intval($result->date / 60). ' Hours ago';
-                } else {
-                    if ($result->date < 10080){
-                        echo intval($result->date / 1440). ' Days ago';
-                    } else {
-                        if ($result->date < 40320){
-                            echo intval($result->date / 10080). ' Weeks ago';
-                        } else {
-                            if ($result->date < 483840){
-                                echo intval($result->date / 40320). ' Months ago';
-                            } else {
-                                echo intval($result->date / 483840). ' Years ago';
-                            }
-                        }
-                    }
-                }
-            }
-
-            ?>
+            <?php echo App::displayTimeAgo('posts', $post); ?>
         </span>
         <script>
 

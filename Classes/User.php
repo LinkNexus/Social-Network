@@ -350,4 +350,24 @@ class User
         $this->connect($result);
     }
 
+    public function deletePost(int $post_id, $post): bool
+    {
+        if ($post->user_id === $this->session->getKey('user_infos')->id || $this->session->getKey('user_infos')->status === 'admin') {
+            $current_image = $post->image;
+            App::deleteFile($current_image, '/Uploads/Posts/');
+            $this->link->query('DELETE FROM posts WHERE id = :id', ['id' => $post_id]);
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteComment(int $comment_id, $comment): bool
+    {
+        if ($comment->user_id === $this->session->getKey('user_infos')->id || $this->session->getKey('user_infos')->status === 'admin') {
+            $current_image = $comment->image;
+            App::deleteFile($current_image, '/Uploads/Comments/');
+            return true;
+        }
+        return false;
+    }
 }
