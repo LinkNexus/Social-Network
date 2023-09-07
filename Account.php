@@ -97,7 +97,7 @@ $user->restrict();
                 if ($Result->date < 0){
                     echo '0 days';
                 } else {
-                    echo $Result->date;
+                    echo $Result->date. ' days';
                 }
             } else {
                 echo '0 days';
@@ -105,7 +105,7 @@ $user->restrict();
 
             ?>
         </div>
-        <?php if (!empty($sresult->born_at)): ?>
+        <?php if (!empty($result->born_at)): ?>
             <div class="info">
                 Age:
                 <?php

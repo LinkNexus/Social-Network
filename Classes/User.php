@@ -51,6 +51,21 @@ class User
         return false;
     }
 
+    /* Static Method to check if the user is banned from the website */
+
+    public function banPeriod($result): bool|string
+    {
+        if ($result->banned){
+            $result = $this->link->query('SELECT DATEDIFF(banned_till, NOW()) as date FROM users WHERE id = :id', [
+                'id' => $result->id
+            ])->fetch();
+
+            return $result->date;
+        }
+
+        return false;
+    }
+
     /* Static Method to connect the user to the website */
 
     public function connect($result): void
@@ -60,7 +75,7 @@ class User
 
     /* Method grouping all the instructions for the sign-up of a new User */
 
-    public function register(string $username, string $password, string $email): void
+    public function register(string $username, string $password, string $email, string $status = 'user'): void
     {
         $password = App::hashPassword($password);
         $token = Str::random(60);
@@ -71,7 +86,7 @@ class User
                 'email' => $email,
                 'password' => $password,
                 'confirmation_token' => $token,
-                'status' => 'user'
+                'status' => $status
             ]
         );
 
@@ -147,21 +162,26 @@ class User
 
     /* Method grouping all the instructions for the sign-in of a user to the website */
 
-    public function login(string $username, string $password, $remember = false): bool|object
+    public function login(string $username, string $password, $remember = false): bool|string
     {
         $result = $this->link->query('SELECT * FROM users WHERE (username = :username OR email = :username) AND confirmed_at IS NOT NULL', ['username' => $username])->fetch();
 
-        if ($result && password_verify($password, $result->password)) {
-            $this->connect($result);
+        if (!$this->banPeriod($result)) {
 
-            if ($remember) {
-                $this->remember($result);
+            if ($result && password_verify($password, $result->password)) {
+                $this->connect($result);
+
+                if ($remember) {
+                    $this->remember($result);
+                }
+
+                return true;
             }
 
-            return $result;
+            return false;
         }
 
-        return false;
+        return $this->banPeriod($result);
 
     }
 
@@ -282,6 +302,8 @@ class User
     {
         if (password_verify($password, $result->password)){
             $this->link->query('DELETE FROM users WHERE id = :id', ['id' => $result->id]);
+            $this->link->query('DELETE FROM posts WHERE user_id = :id', ['id' => $result->id]);
+            $this->link->query('DELETE FROM comments WHERE user_id = :id', ['id' => $result->id]);
             $this->logout();
             return true;
         }
@@ -311,6 +333,38 @@ class User
         }
 
         return NULL;
+    }
+
+    public function makePost($title, $description, $content, $user_id, $image = NULL): void
+    {
+        $this->link->query('INSERT INTO posts(title, description, content, image, user_id, posted_at) VALUES (:title, :description, :content, :image, :user_id, NOW())', [
+            'title' => $title,
+            'description' => $description,
+            'content' => $content,
+            'image' => $image,
+            'user_id' => $user_id
+        ]);
+
+        if ($image){
+            move_uploaded_file($_FILES['postPic']['tmp_name'], 'Uploads/Posts/' . $image);
+        }
+    }
+
+    public function modifyPost($title, $description, $content, $post_id, $post, $image = NULL, $image_posted = true): void
+    {
+        if ($image || !$image_posted){
+            $current_image = $post->image;
+            App::deleteFile($current_image, '/Uploads/Posts/');
+            move_uploaded_file($_FILES['postPic']['tmp_name'], 'Uploads/Posts/'. $image);
+        }
+
+        $this->link->query('UPDATE posts SET title = :title, description = :description, content = :content, image = :image, modified_at = NOW() WHERE id = :id', [
+            'title' => $title,
+            'description' => $description,
+            'content' => $content,
+            'image' => $image,
+            'id' => $post_id
+        ]);
     }
 
     public function upLoadFile(array $file, int $fileWeight, array $allowedExtensions): ?bool
@@ -352,7 +406,7 @@ class User
 
     public function deletePost(int $post_id, $post): bool
     {
-        if ($post->user_id === $this->session->getKey('user_infos')->id || $this->session->getKey('user_infos')->status === 'admin') {
+        if ($post->user_id === $this->session->getKey('user_infos')->id || str_contains($this->session->getKey('user_infos')->status, 'admin')) {
             $current_image = $post->image;
             App::deleteFile($current_image, '/Uploads/Posts/');
             $this->link->query('DELETE FROM posts WHERE id = :id', ['id' => $post_id]);
@@ -363,11 +417,47 @@ class User
 
     public function deleteComment(int $comment_id, $comment): bool
     {
-        if ($comment->user_id === $this->session->getKey('user_infos')->id || $this->session->getKey('user_infos')->status === 'admin') {
+        if ($comment->user_id === $this->session->getKey('user_infos')->id || str_contains($this->session->getKey('user_infos')->status, 'admin')) {
             $current_image = $comment->image;
             App::deleteFile($current_image, '/Uploads/Comments/');
             return true;
         }
+        return false;
+    }
+
+    public function blockComments($post, $index, $post_id): void
+    {
+        if ($post->user_id === $this->session->getKey('user_infos')->id || str_contains($this->session->getKey('user_infos')->status, 'admin')) {
+            $this->link->query('UPDATE posts SET comments_blocked = :comments_blocked WHERE id = :id', [
+                'comments_blocked' => $index,
+                'id' => $post_id
+            ]);
+
+        }
+    }
+
+    public function confirmAdminRequest($result, $value): bool
+    {
+        $this->link->query('UPDATE users SET admin_request = :admin_request WHERE id = :id', [
+            'admin_request' => NULL,
+            'id' => $result->id
+        ]);
+
+        if ($value == 1) {
+            $this->link->query('UPDATE users SET status = :status WHERE id = :id', [
+                'id' => $result->id,
+                'status' => 'admin'
+            ]);
+
+            $result = $this->link->query('SELECT * FROM users WHERE id = :id', [
+                'id' => $result->id
+            ]);
+
+            $this->connect($result);
+
+            return true;
+        }
+
         return false;
     }
 }

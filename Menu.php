@@ -36,6 +36,10 @@ $user->restrict();
         <span class="material-symbols-outlined">settings</span>
         <span class="icon-text">SETTINGS</span>
     </a>
+    <a href="#" class="nav-links" id="deleteAccount">
+        <span class="material-symbols-outlined">delete</span>
+        <span class="icon-text">INFO</span>
+    </a>
 </div>
 <div id="social-media">
     <h2>FOLLOW US ON</h2>

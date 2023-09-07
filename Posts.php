@@ -194,7 +194,7 @@ if (App::getValidator()->isPosted()){
                     <?php endif; ?>
                 </div>
             </div>
-            <a href="PostMenu.php?id=<?= $post->id ?>" class="material-symbols-outlined">more_vert</a>
+            <a href="PostMenu.php?id=<?= $post->id; ?>" class="material-symbols-outlined">more_vert</a>
         </div>
         <h2 class="title"><?php echo $post->title ?></h2>
         <div class="description"><?php echo $post->description ?></div>

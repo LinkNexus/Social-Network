@@ -3,7 +3,9 @@
 class Validator
 {
 
-    protected array $data, $errors;
+    protected array $data = [];
+
+    protected array $errors = [];
 
     public function __construct(array $data)
     {
@@ -51,12 +53,20 @@ class Validator
 
     }
 
-    public function isUnique(string $field, Database $link, string $table, string $errorMsg): void
+    public function isUnique(string $field, Database $link, User $user, array $errorMessages): void
     {
 
-        $product = $link->query('SELECT id FROM '. $table .' WHERE username = :username', ['username' => $this->getField($field)])->fetch();
-        if ($product){
-            $this->errors[$field] = $errorMsg;
+        $result = $link->query('SELECT * FROM users WHERE '. $field .'= :'. $field, [$field => $this->getField($field)])->fetch();
+        if ($result){
+            if ($user->banPeriod($result)){
+                if (!in_array($errorMessages[0], $this->errors)) {
+                    if ($user->banPeriod($result) > 0) {
+                        $this->errors[$field] = $errorMessages[0] . $user->banPeriod($result) . ' days';
+                    }
+                }
+            } else {
+                $this->errors[$field] = $errorMessages[1];
+            }
         }
 
     }

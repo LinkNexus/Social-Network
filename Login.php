@@ -17,8 +17,11 @@ if ($validator->isPosted() && $validator->isValuePosted('username') && $validato
     $result = $user->login($_POST['username'], $_POST['password'], isset($_POST['remember']));
 
     if ($result) {
-        $session->setFlash('success', 'You are now connected');
-        App::redirect('Account.php');
+        if (is_bool($result)) {
+            $session->setFlash('success', 'You are now connected');
+            App::redirect('Account.php');
+        }
+        $session->setFlash('alert', 'The Account with this Username/Email is temporary banned for '. $result .' days');
     } else {
         $session->setFlash('alert', 'Connection Information are invalid');
     }

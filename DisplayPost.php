@@ -226,11 +226,13 @@ if (App::getValidator()->isPosted()){
         <?php endif; ?>
         <a href="#" class="material-symbols-outlined">share</a>
     </div>
-    <form action="" method="post" enctype="multipart/form-data">
-        <textarea class="commentInput" placeholder="Write your comment here" name="comment"></textarea>
-        <input type="file" name="commentPic">
-        <button type="submit">Submit</button>
-    </form>
+    <?php if ($post->comments_blocked == 0): ?>
+        <form action="" method="post" enctype="multipart/form-data">
+            <textarea class="commentInput" placeholder="Write your comment here" name="comment"></textarea>
+            <input type="file" name="commentPic">
+            <button type="submit">Submit</button>
+        </form>
+    <?php endif; ?>
     <span class="postFooter">Posted
         <?php echo App::displayTimeAgo('posts', $post); ?>
     </span>
@@ -336,7 +338,8 @@ if (App::getValidator()->isPosted()){
     }
 
     .comments>img{
-        width: calc(30%);
+        max-width: calc(38%);
+        max-height: 500px;
         cursor: pointer;
         border-radius: 10px;
         margin-bottom: 40px;

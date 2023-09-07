@@ -12,9 +12,9 @@ if ($validator->isPosted()){
     $errors = array();
 
     $validator->isAlphanumeric('username', 'Username must not be empty and can only contain letters, numbers and underscores');
-    $validator->isUnique('username', $link, 'users', 'This Username is already used in another Account');
+    $validator->isUnique('username', $link, $user, ['The Account with this Username/Email is already banned for ', 'This Username is already used in another Account']);
     $validator->isEmail('email', 'Email must not be empty and must be valid');
-    $validator->isUnique('email', $link, 'users', 'This Email is already used in another Account');
+    $validator->isUnique('email', $link, $user, ['The Account with this Username/Email is already banned for ', 'This Username is already used in another Account']);
     $validator->isConfirmed(['password', 'confirm_password'], ['Password must not be empty and must contain at least 5 characters', 'Passwords do not match']);
 
     if ($validator->isValid()){

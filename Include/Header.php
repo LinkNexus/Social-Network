@@ -13,6 +13,57 @@
 
 <body>
 
+<?php
+
+if (isset(App::getSession()->getKey('user_infos')->id)) {
+    if (App::getSession()->getKey('user_infos')->status === 'super_admin'){
+        $result = App::getDatabase()->query('SELECT * FROM users WHERE admin_request = 0')->fetch();
+
+        if ($result) {
+            echo
+                '<script>
+                     if (window.confirm("Do approve that '. $result->username .' becomes an Administrator of this Website?")){
+                         window.location = "AddAdmin.php?answer=1&id='. $result->id .'";
+                     } else {
+                         window.location = "AddAdmin.php?answer=0&id='. $result->id .'";
+                     }
+                </script>'
+            ;
+        } else {
+            $result = App::getDatabase()->query('SELECT * FROM users WHERE remove_admin = 1')->fetch();
+
+            if ($result){
+                echo
+                    '<script>
+                         if (window.confirm("Do you approve to remove '. $result->username .' from the Administrators of this Website?")){
+                             window.location = "RemoveAdmin.php?answer=1&id='. $result->id .'";
+                         } else {
+                             window.location = "RemoveAdmin.php?answer=0&id='. $result->id .'";
+                         }
+                    </script>'
+                ;
+            }
+        }
+    } else {
+        $result = App::getDatabase()->query('SELECT * FROM users WHERE id = :id', [
+            'id' => App::getSession()->getKey('user_infos')->id
+        ])->fetch();
+
+        if ($result->admin_request == 1) {
+            echo
+                '<script>
+                     if (window.confirm("Do you want to become an Administrator of this Website?")){
+                         window.location = "AddAdmin.php?value=1";
+                     } else {
+                         window.location = "AddAdmin.php?value=0";
+                     }
+                </script>';
+        }
+    }
+}
+
+?>
+
 <div class="nav-bar" id="nav-bar">
     <p class="logo">TheBlog</p>
     <div>

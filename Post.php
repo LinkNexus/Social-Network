@@ -30,18 +30,8 @@ if ($validator->isPosted()){
             if (!empty($_FILES['postPic']['name'])){
                 if ($_FILES['postPic']['error'] == 0){
                     if ($user->upLoadFile($_FILES['postPic'], 5242880, ['jpg', 'jpeg', 'gif', 'png'])){
-                        $current_image = $post->image;
-                        App::deleteFile($current_image, '/Uploads/Posts/');
+                        $user->modifyPost($_POST['title'], $_POST['description'], $_POST['content'], $post_id, $post, basename($_FILES['postPic']['name']));
 
-                        $link->query('UPDATE posts SET title = :title, description = :description, content = :content, image = :image, modified_at = NOW() WHERE id = :id', [
-                            'title' => $_POST['title'],
-                            'description' => $_POST['description'],
-                            'content' => $_POST['content'],
-                            'image' => basename($_FILES['postPic']['name']),
-                            'id' => $post_id
-                        ]);
-
-                        move_uploaded_file($_FILES['postPic']['tmp_name'], 'Uploads/Posts/' . basename($_FILES['postPic']['name']));
                     } else {
                         if (is_bool($user->upLoadFile($_FILES['postPic'], 5242880, ['jpg', 'jpeg', 'gif', 'png']))) {
                             $session->setFlash('alert', 'Allowed File Extensions are: jpg, jpeg, gif, png');
@@ -49,38 +39,17 @@ if ($validator->isPosted()){
                             $session->setFlash('alert', 'The File must not be more than 5Mo');
                         }
 
-                        $link->query('UPDATE posts SET title = :title, description = :description, content = :content, modified_at = NOW() WHERE id = :id', [
-                            'title' => $_POST['title'],
-                            'description' => $_POST['description'],
-                            'content' => $_POST['content'],
-                            'id' => $post_id
-                        ]);
+                        $user->modifyPost($_POST['title'], $_POST['description'], $_POST['content'], $post_id, $post);
 
                     }
                 } else {
-                    $current_image = $post->image;
-                    App::deleteFile($current_image, '/Uploads/Posts/');
-
-                    $link->query('UPDATE posts SET title = :title, description = :description, content = :content, image = NULL, modified_at = NOW() WHERE id = :id', [
-                        'title' => $_POST['title'],
-                        'description' => $_POST['description'],
-                        'content' => $_POST['content'],
-                        'id' => $post_id
-                    ]);
+                    $user->modifyPost($_POST['title'], $_POST['description'], $_POST['content'], $post_id, $post);
                 }
             } else {
-                $current_image = $post->image;
-                App::deleteFile($current_image, '/Uploads/Posts/');
-
-                $link->query('UPDATE posts SET title = :title, description = :description, content = :content, image = NULL, modified_at = NOW() WHERE id = :id', [
-                    'title' => $_POST['title'],
-                    'description' => $_POST['description'],
-                    'content' => $_POST['content'],
-                    'id' => $post_id
-                ]);
+                $user->modifyPost($_POST['title'], $_POST['description'], $_POST['content'], $post_id, $post, NULL, false);
             }
 
-            $session->setFlash('success', 'The Post has successfully modified');
+            $session->setFlash('success', 'The Post has been successfully modified');
             App::redirect('Posts.php');
         } else {
             $errors = $validator->getErrors();
@@ -99,15 +68,8 @@ if ($validator->isPosted()){
             if (!empty($_FILES['postPic'])) {
                 if ($_FILES['postPic']['error'] == 0) {
                     if ($user->upLoadFile($_FILES['postPic'], 5242880, ['jpg', 'jpeg', 'gif', 'png'])) {
-                        $link->query('INSERT INTO posts(title, description, content, image, user_id, posted_at) VALUES (:title, :description, :content, :image, :user_id, NOW())', [
-                            'title' => $_POST['title'],
-                            'description' => $_POST['description'],
-                            'content' => $_POST['content'],
-                            'image' => basename($_FILES['postPic']['name']),
-                            'user_id' => $user_id
-                        ]);
 
-                        move_uploaded_file($_FILES['postPic']['tmp_name'], 'Uploads/Posts/' . basename($_FILES['postPic']['name']));
+                        $user->makePost($_POST['title'], $_POST['description'], $_POST['content'], $user_id, basename($_FILES['postPic']['name']));
                     } else {
                         if (is_bool($user->upLoadFile($_FILES['postPic'], 5242880, ['jpg', 'jpeg', 'gif', 'png']))) {
                             $session->setFlash('alert', 'Allowed File Extensions are: jpg, jpeg, gif, png');
@@ -115,28 +77,13 @@ if ($validator->isPosted()){
                             $session->setFlash('alert', 'The File must not be more than 5Mo');
                         }
 
-                        $link->query('INSERT INTO posts(title, description, content, user_id, posted_at) VALUES (:title, :description, :content, :user_id, NOW())', [
-                            'title' => $_POST['title'],
-                            'description' => $_POST['description'],
-                            'content' => $_POST['content'],
-                            'user_id' => $user_id
-                        ]);
+                        $user->makePost($_POST['title'], $_POST['description'], $_POST['content'], $user_id);
                     }
                 } else {
-                    $link->query('INSERT INTO posts(title, description, content, user_id, posted_at) VALUES (:title, :description, :content, :user_id, NOW())', [
-                        'title' => $_POST['title'],
-                        'description' => $_POST['description'],
-                        'content' => $_POST['content'],
-                        'user_id' => $user_id
-                    ]);
+                    $user->makePost($_POST['title'], $_POST['description'], $_POST['content'], $user_id);
                 }
             } else {
-                $link->query('INSERT INTO posts(title, description, content, user_id, posted_at) VALUES (:title, :description, :content, :user_id, NOW())', [
-                    'title' => $_POST['title'],
-                    'description' => $_POST['description'],
-                    'content' => $_POST['content'],
-                    'user_id' => $user_id
-                ]);
+                $user->makePost($_POST['title'], $_POST['description'], $_POST['content'], $user_id);
             }
 
             $session->setFlash('success', 'The Post has successfully published');

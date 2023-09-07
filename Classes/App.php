@@ -51,6 +51,16 @@ class App
         return new User(self::getDatabase(), self::getSession());
     }
 
+    public static function getAdmin(): Admin
+    {
+        return new Admin(self::getDatabase(), self::getSession());
+    }
+
+    public static function getSuperAdmin(): SuperAdmin
+    {
+        return new SuperAdmin(self::getDatabase(), self::getSession());
+    }
+
     public static function getValidator(): Validator
     {
         return new Validator($_POST);

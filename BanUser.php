@@ -4,32 +4,33 @@ require_once 'Include/Load.php';
 
 $session = App::getSession();
 $link = App::getDatabase();
-$user = App::getUser();
+$admin = App::getAdmin();
 $validator = App::getValidator();
 
-$user->restrict();
+$admin->restrict();
+
+if (!str_contains($session->getKey('user_infos')->status, 'admin') || !$admin->has('id')){
+    App::redirect('Posts.php');
+}
 
 if ($validator->isPosted()){
     $result = $link->query('SELECT * FROM users WHERE id = :id', [
-        'id' => $session->getKey('user_infos')->id
+        'id' => App::get('id')
     ])->fetch();
 
-    if ($user->deleteAccount($result, $_POST['password'])) {
-        $session->setFlash('success', 'Your Account has been successfully deleted');
-        App::redirect('Login.php');
-    } else {
-        $session->setFlash('alert', "Your Account's Password is incorrect");
-    }
+    $admin->banUser($result, $_POST['ban_period']);
+    $session->setFlash('success', 'The User has been successfully banned for '. $_POST['ban_period'] .' days');
+    App::redirect('Posts.php');
 }
 
 ?>
 <?php require_once 'Include/Header.php'; ?>
 <div class="login-box">
-    <h2>Delete Account</h2>
+    <h2>Ban User</h2>
     <form action="" method="post">
         <div class="user-box">
-            <input type="password" name="password" required="">
-            <label>Password</label>
+            <input type="number" name="ban_period">
+            <label>Period of Ban (in Days)</label>
         </div>
         <button type="submit">Submit</button>
     </form>
