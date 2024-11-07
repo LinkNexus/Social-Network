@@ -10,15 +10,7 @@
         buttons = document.querySelectorAll('a, button'),
         inputFields = document.querySelectorAll('input'),
         labels = document.querySelectorAll('label'),
-        mode = <?php
-
-            if (App::getSession()->getKey('mode') == 1) {
-                echo '1';
-            } else {
-                echo '0';
-            }
-
-            ?>,
+        mode = <?= App::getSession()->getKey('mode') == 1 ? '1' : '0' ?>,
         hover = 0,
         focus = 0;
 
