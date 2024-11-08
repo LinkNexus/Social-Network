@@ -90,9 +90,7 @@ class User
             ]
         );
 
-        $directory = 'Mini_Blog'; /* The name of the directory where the entire project is */
-
-        $full_URL = "http". (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 's' : '') .'://'. $_SERVER['HTTP_HOST'] . '/'. (empty($directory) ? '' : $directory .'/') .'Confirm.php';
+        $full_URL = "http". (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 's' : '') .'://'. $_SERVER['HTTP_HOST'] .'/' .'Confirm.php';
 
         try
         {

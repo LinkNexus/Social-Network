@@ -19,6 +19,16 @@ class App
     public function __construct()
     {}
 
+    public static function loadEnv(): array
+    {
+        $env = parse_ini_file(__DIR__ . '/../.env');
+        if ($env === false) {
+            throw new \Exception('Failed to parse .env file');
+        }
+
+        return $env;
+    }
+
     /* Static Method used to instantiate the class Session with the same parameters all over the code and
     to prevent the presence of 2 Instances of the Class */
 
@@ -36,8 +46,9 @@ class App
 
     public static function getDatabase(): Database
     {
+        $env = self::loadEnv();
         if (!self::$link) {
-            self::$link = new Database('mini-blog', 'root', '');
+            self::$link = new Database($env['DATABASE_NAME'], $env['DATABASE_USER'], $env['DATABASE_PASSWORD'], $env['DATABASE_HOST']);
         }
 
         return self::$link;
@@ -92,6 +103,7 @@ class App
 
     public static function sendWithGmail($to, $subject, $content): void
     {
+        $env = self::loadEnv();
         // passing true in constructor enables exceptions in PHPMailer
         $mail = new PHPMailer(true);
 
@@ -104,8 +116,8 @@ class App
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
-            $username = "nkenengnunlafrancklevy@gmail.com"; // gmail email
-            $password = "vqitwblvefidajdw"; // app password
+            $username = $env['GMAIL_USER']; // gmail email
+            $password = $env['GMAIL_PASSWORD']; // app password
 
             $mail->Username = $username;
             $mail->Password = $password;

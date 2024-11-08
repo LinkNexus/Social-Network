@@ -30,15 +30,17 @@ $user->restrict();
                     'id' => $session->getKey('user_infos')->id
             ])->fetch();
 
-            if ($result){
-                if ($result->date < 0){
-                    echo '0 days';
-                } else {
-                    echo $result->date;
-                }
-            } else {
-                echo '0 days';
-            }
+            echo $result ? $result->date ?? '0 days' : '0 days';
+
+//            if ($result){
+//                if ($result->date < 0){
+//                    echo '0 days';
+//                } else {
+//                    echo $result->date;
+//                }
+//            } else {
+//                echo '0 days';
+//            }
 
             ?>
         </div>

@@ -33,56 +33,33 @@ These instructions will guide you on how to set up and run the project locally.
 
 1. Clone the repository:
     ```bash
-       git clone https://github.com/LinkNexus/ReactTodoList.git
-    cd ReactTodoList
+       git clone https://github.com/LinkNexus/Social-Network.git
+    cd Social-Network
     ```
 
-2. Create the .env.local file using the .env file as model
+2. Create an .env file at the root of the project
    ```bash
-   cp .env .env.local
+   touch .env 
     ```
 
-3. In the .env.local file, override necessary environment variables. In case you have no mailing services, you can use [mailpit](https://mailpit.axllent.org/docs/install/) which is very simple to use.
+3. In the .env file, create necessary environment variables. 
    ```bash
-   MAILER_DSN=your mailer configuration
-    ```
-    - Using MySQL
-   ```bash
-   DATABASE_URL="mysql://{your username}:{your password}@127.0.0.1:3306/{your database name}?serverVersion=8.0.32&charset=utf8mb4"
-    ```
-    - Using MariaDB
-   ```bash
-   DATABASE_URL="mysql://{your username}:{your password}@127.0.0.1:3306/{your database name}?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
-    ```
-    - Using PostgreSQL
-   ```bash
-   DATABASE_URL="postgresql://{your username}:{your password}@127.0.0.1:5432/{your database name}?serverVersion=16&charset=utf8"
+   DATABASE_USER=
+   DATABASE_PASSWORD=
+   DATABASE_NAME=
+   DATABASE_HOST=
+   GMAIL_USER=
+   GMAIL_PASSWORD=
     ```
 
-4. Create the database, migrations and modify the database
-    - Using PHP
+4. Use the database.sql file to create the database and tables
    ```bash
-   mkdir migrations
-   php bin/console make:migration
-   php bin/console doctrine:migration:migrate
-    ```
-    - Using Symfony CLI
-   ```bash
-   mkdir migrations
-   symfony console make:migration
-   symfony console doctrine:migration:migrate
-   ```
-
-5. Install the dependencies:
-    ```bash
-    npm install
-   composer install
+   mysql -u linknexus -p social_network < database.sql
     ```
 
 6. Start the development server:
     ```bash
    php -S localhost:8000 -t public/
-   npm run dev
     ```
 
 7. Open your browser and visit [http://localhost:8000](http://localhost:8000) to see the blog.
@@ -91,9 +68,7 @@ These instructions will guide you on how to set up and run the project locally.
 
 ## Usage
 
-- **Styling**: The styling is made by tailwind. Many of the elements are made from ShadCN UI, hence just the modifying
-  the global css variables may help to change the styling to your wants.
-- **Build for Production**: Run `npm run build` to create an optimized production build in the `build/` directory.
+- **Styling**: The styling is made by using pure css in the file called Styles/Style.css.
 
 ---
 
