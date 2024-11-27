@@ -54,7 +54,7 @@ These instructions will guide you on how to set up and run the project locally.
 
 4. Use the database.sql file to create the database and tables
    ```bash
-   mysql -u linknexus -p social_network < database.sql
+   mysql -u username -p password < database.sql
     ```
 
 6. Start the development server:
